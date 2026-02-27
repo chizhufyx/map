@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统控制台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f7fa;
+        }
+        
+        /* 主容器 */
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 15px;
+            gap: 15px;
+        }
+        
+        /* 嵌入式窗口区域 */
+        .main-content {
+            flex: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background-color: white;
+            position: relative;
+        }
+        
+        /* 错误提示样式 */
+        .error-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fef2f2;
+            color: #dc2626;
+            z-index: 10;
+        }
+        
+        .error-message h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .error-message p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        /* 嵌入式iframe样式 */
+        #contentFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* 侧边按钮区域 */
+        .sidebar {
+            width: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* 按钮样式 */
+        .back-btn {
+            padding: 12px 24px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .back-btn:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .back-btn:active {
+            background-color: #1e40af;
+        }
+        
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: 80px;
+            }
+            .back-btn {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主内容窗口 -->
+        <div class="main-content">
+            <!-- 错误提示区域（初始隐藏） -->
+            <div class="error-message" id="errorDisplay" style="display: none;">
+                <h2>后端网页无法连接</h2>
+                <p>请检查网络或目标地址是否可用</p>
+            </div>
+            <!-- 嵌入式网页窗口 -->
+            <iframe id="contentFrame" src="http://210.16.168.53:4567" onload="hideError()" onError="showError()"></iframe>
+        </div>
+        
+        <!-- 侧边按钮区域 -->
+        <div class="sidebar">
+            <button class="back-btn" onclick="window.open('https://web.chizhudream.top', '_blank')">回到官网</button>
+        </div>
+    </div>
+
+    <script>
+        // 显示错误提示
+        function showError() {
+            document.getElementById('errorDisplay').style.display = 'flex';
+            document.getElementById('contentFrame').style.display = 'none';
+        }
+        
+        // 隐藏错误提示
+        function hideError() {
+            document.getElementById('errorDisplay').style.display = 'none';
+            document.getElementById('contentFrame').style.display = 'block';
+        }
+        
+        // 额外的错误监听（兼容不同浏览器）
+        window.addEventListener('load', function() {
+            const frame = document.getElementById('contentFrame');
+            // 监听iframe加载状态
+            frame.addEventListener('error', showError);
+            // 超时检测（5秒未加载则判定为无法连接）
+            setTimeout(function() {
+                if (frame.contentWindow.document.body.innerHTML === '') {
+                    showError();
+                }
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
